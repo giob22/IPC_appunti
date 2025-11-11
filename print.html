@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-c397b57f.js";
+            window.path_to_searchindex_js = "searchindex-a019493b.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-18d1fdea.js"></script>
+        <script src="toc-d8baf949.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -1439,8 +1439,30 @@ int queue_condition(Monitor*, int);
 <li>altrimenti la procedura <code>signal_cond(&amp;m, id_var_cond)</code> è ininfluente, il contatore dei processi in attesa nella coda urgente viene decrementato <code>(*(m-&gt;urgent_count))--</code> e il processo continua ad eseguire all’interno del monitor.</li>
 </ol>
 <h3 id="signal-and-continue"><a class="header" href="#signal-and-continue">signal-and-continue</a></h3>
-<p>// @todo contiuna…</p>
-<div style="break-before: page; page-break-before: always;"></div>
+<p><strong><code>wait_condition(Monitor* m, int id_var_cond)</code></strong></p>
+<ol>
+<li>
+<p>il processo incrementa il contatore di processi in attesa sulla <em>condition variable</em> eseguendo <code>m-&gt;cond_counts[id_var_cond]++</code>;</p>
+</li>
+<li>
+<p>il processo esegue una <code>signal_sem(m-&gt;mutex, 0)</code> in modo da permettere ad altri processi di accedere al monitor;</p>
+</li>
+<li>
+<p>successivamente si sospende volontariamente sulla <em>condition variable</em>, il cui identificatore è passata per parametro, mediante una <code>signal_sem(m-&gt;var_conds, id_var_cond)</code>;</p>
+</li>
+<li>
+<p>nel momento in cui viene riattivato da un processo segnalatore che effettua una <code>signal_sem()</code> sulla stessa <em>condition variable</em> riprende l’esecuzione facendo una <code>wait_sem(m-&gt;mutex, 0)</code> per sospendersi sulla coda dei processi in attesa del monitor.</p>
+<p>Questo perché  ci troviamo in un monitor <strong>signal-and-continue</strong> quindi nel momento in cui un processo sospeso una una variabile condition viene sbloccato questo deve ritornare nella coda dei processi che attendono di ottenere il monitor. Altrimenti ci saranno due processi che operano all’interno del monitor.</p>
+</li>
+</ol>
+<p><strong><code>signal_cond(Monitor* m, int id_var_cond)</code></strong></p>
+<ol>
+<li>verifica se sono presenti dei processi in attesa sulla <em>condition variable</em> verificando il contatore in <code>m-&gt;cond_counts[id_var_cond]</code>;</li>
+<li>se sono presenti dei processi in attesa allora esegue una <code>signal_sem(m-&gt;var_conds, id_var_cond)</code> e decrementa il numero di processi in attesa sulla variabile condition <code>m-&gt;cond_counts[id_var_cond]--</code>;</li>
+<li>altrimenti la chiamata è ininfluente.</li>
+</ol>
+<p>In entrambi i casi, sia che la verifica sia vero oppure falsa, il processo segnalatore continua la sua esecuzione all’interno del monitor.</p>
+<!--todo aggiungi il codice sorgente per ogni workflow   --><div style="break-before: page; page-break-before: always;"></div>
 <h1 id="sincronizzazione-nel-modello-ad-ambiente-locale"><a class="header" href="#sincronizzazione-nel-modello-ad-ambiente-locale">Sincronizzazione nel modello ad ambiente locale</a></h1>
 <p>Il modello ad ambiente <strong>locale</strong> si riferisce ad una struttura in cui ogni processo opera nel proprio ambiente privato, <strong>senza alcuna memoria condivisa</strong> tra vari processi.</p>
 <p>In questo modello tutte le risorse sono privare a ciascun processo e non possono essere modificate direttamente da altri processi.</p>
@@ -1682,6 +1704,30 @@ int queue_condition(Monitor*, int);
 
 <p>Possiamo quindi capire da questa immagine quali sono le informazioni di interesse per una mailbox.</p>
 <p>Il ruolo della mailbox è da intermediario.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="note"><a class="header" href="#note">NOTE</a></h1>
+<h2 id="utilizzo-di-semafori-tra-processi-con-fork--exec"><a class="header" href="#utilizzo-di-semafori-tra-processi-con-fork--exec">Utilizzo di semafori tra processi con fork + exec</a></h2>
+<p><strong>PROBLEMA DELLA VALIDITÁ DEL DESCRITTORE DELL’ARRAY SEMAFORICO:</strong></p>
+<p>Supponiamo di avere un processo che crea altri <code>N</code> processi con <code>fork() + exec()</code> oppure in generale più processi con area testo diversa che operano su una <code>shm</code> il cui accesso è gestito dall’utilizzo di semafori.</p>
+<p>Possiamo avere diverse implementazioni che apparentemente potrebbero sembrare valide, ma in realtà nascondono un problema legato alla validità del descrittore dell’array semaforico.</p>
+<p>(vedi prova di autovalutazione#1)</p>
+<p>due potrebbero essere le soluzioni:</p>
+<ol>
+<li>
+<p>il padre fa una <code>shmget + shmat</code> e <code>semget</code> (utilizzando una chiave generata con <code>ftok</code>) creando le risorse IPC e in tutte le applicazioni generate con <code>fork + exec</code> si ripete <code>shmget + shmat</code> e `semget;</p>
+</li>
+<li>
+<p>il padre fa una <code>shmget + shmat</code> e <code>semget</code> creando le risorse IPC, ma mettendo nella struttura dati che descrive la risorsa condivisa da proteggere anche l’identificativo dell’array semaforico.</p>
+<pre><code class="language-c"> struct SharedData{
+     int semid;
+     // ...
+ }
+</code></pre>
+<p>Quindi nelle applicazioni create con <code>fork + exec</code> si eseguirà solo <code>shmget + shmat</code> (utilizzando la stessa chiave generata con <code>ftok</code>) ottenendo il descrittore dell’array semaforico accedendo alla struttura dati condivisa.</p>
+</li>
+</ol>
+<p>La seconda soluzione, seppur valida e funzionante pone un rischio dal punto di vista della <strong>validità del descrittore</strong> se qualche processo prova a cancellare l’array semaforico. Perché essendo che la rimozione fisica dell’array semaforico legata alla <code>semop()</code>, questo potrebbe essere eliminato definitivamente se nessun processo è in attesa su un semaforo.</p>
+<p>Questo quindi vuol dire che nel momento in cui un’altro processo che ha ottenuto direttamente il costruttore (tramite la <code>shm</code>) prova ad utilizzare il semaforo potrebbe ottenere un comportamento inaspettato.</p>
 
                     </main>
 

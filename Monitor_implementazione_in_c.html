@@ -35,10 +35,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-c397b57f.js";
+            window.path_to_searchindex_js = "searchindex-a019493b.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-18d1fdea.js"></script>
+        <script src="toc-d8baf949.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -250,8 +250,30 @@ int queue_condition(Monitor*, int);
 <li>altrimenti la procedura <code>signal_cond(&amp;m, id_var_cond)</code> è ininfluente, il contatore dei processi in attesa nella coda urgente viene decrementato <code>(*(m-&gt;urgent_count))--</code> e il processo continua ad eseguire all’interno del monitor.</li>
 </ol>
 <h3 id="signal-and-continue"><a class="header" href="#signal-and-continue">signal-and-continue</a></h3>
-<p>// @todo contiuna…</p>
-
+<p><strong><code>wait_condition(Monitor* m, int id_var_cond)</code></strong></p>
+<ol>
+<li>
+<p>il processo incrementa il contatore di processi in attesa sulla <em>condition variable</em> eseguendo <code>m-&gt;cond_counts[id_var_cond]++</code>;</p>
+</li>
+<li>
+<p>il processo esegue una <code>signal_sem(m-&gt;mutex, 0)</code> in modo da permettere ad altri processi di accedere al monitor;</p>
+</li>
+<li>
+<p>successivamente si sospende volontariamente sulla <em>condition variable</em>, il cui identificatore è passata per parametro, mediante una <code>signal_sem(m-&gt;var_conds, id_var_cond)</code>;</p>
+</li>
+<li>
+<p>nel momento in cui viene riattivato da un processo segnalatore che effettua una <code>signal_sem()</code> sulla stessa <em>condition variable</em> riprende l’esecuzione facendo una <code>wait_sem(m-&gt;mutex, 0)</code> per sospendersi sulla coda dei processi in attesa del monitor.</p>
+<p>Questo perché  ci troviamo in un monitor <strong>signal-and-continue</strong> quindi nel momento in cui un processo sospeso una una variabile condition viene sbloccato questo deve ritornare nella coda dei processi che attendono di ottenere il monitor. Altrimenti ci saranno due processi che operano all’interno del monitor.</p>
+</li>
+</ol>
+<p><strong><code>signal_cond(Monitor* m, int id_var_cond)</code></strong></p>
+<ol>
+<li>verifica se sono presenti dei processi in attesa sulla <em>condition variable</em> verificando il contatore in <code>m-&gt;cond_counts[id_var_cond]</code>;</li>
+<li>se sono presenti dei processi in attesa allora esegue una <code>signal_sem(m-&gt;var_conds, id_var_cond)</code> e decrementa il numero di processi in attesa sulla variabile condition <code>m-&gt;cond_counts[id_var_cond]--</code>;</li>
+<li>altrimenti la chiamata è ininfluente.</li>
+</ol>
+<p>In entrambi i casi, sia che la verifica sia vero oppure falsa, il processo segnalatore continua la sua esecuzione all’interno del monitor.</p>
+<!--todo aggiungi il codice sorgente per ogni workflow   -->
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

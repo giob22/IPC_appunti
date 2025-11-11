@@ -3,8 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Page not found - IPC</title>
-        <base href="/">
+        <title>Note: - IPC</title>
 
 
         <!-- Custom HTML head -->
@@ -175,13 +174,37 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="document-not-found-404"><a class="header" href="#document-not-found-404">Document not found (404)</a></h1>
-<p>This URL is invalid, sorry. Please use the navigation bar or search to continue.</p>
+                        <h1 id="note"><a class="header" href="#note">NOTE</a></h1>
+<h2 id="utilizzo-di-semafori-tra-processi-con-fork--exec"><a class="header" href="#utilizzo-di-semafori-tra-processi-con-fork--exec">Utilizzo di semafori tra processi con fork + exec</a></h2>
+<p><strong>PROBLEMA DELLA VALIDITÁ DEL DESCRITTORE DELL’ARRAY SEMAFORICO:</strong></p>
+<p>Supponiamo di avere un processo che crea altri <code>N</code> processi con <code>fork() + exec()</code> oppure in generale più processi con area testo diversa che operano su una <code>shm</code> il cui accesso è gestito dall’utilizzo di semafori.</p>
+<p>Possiamo avere diverse implementazioni che apparentemente potrebbero sembrare valide, ma in realtà nascondono un problema legato alla validità del descrittore dell’array semaforico.</p>
+<p>(vedi prova di autovalutazione#1)</p>
+<p>due potrebbero essere le soluzioni:</p>
+<ol>
+<li>
+<p>il padre fa una <code>shmget + shmat</code> e <code>semget</code> (utilizzando una chiave generata con <code>ftok</code>) creando le risorse IPC e in tutte le applicazioni generate con <code>fork + exec</code> si ripete <code>shmget + shmat</code> e `semget;</p>
+</li>
+<li>
+<p>il padre fa una <code>shmget + shmat</code> e <code>semget</code> creando le risorse IPC, ma mettendo nella struttura dati che descrive la risorsa condivisa da proteggere anche l’identificativo dell’array semaforico.</p>
+<pre><code class="language-c"> struct SharedData{
+     int semid;
+     // ...
+ }
+</code></pre>
+<p>Quindi nelle applicazioni create con <code>fork + exec</code> si eseguirà solo <code>shmget + shmat</code> (utilizzando la stessa chiave generata con <code>ftok</code>) ottenendo il descrittore dell’array semaforico accedendo alla struttura dati condivisa.</p>
+</li>
+</ol>
+<p>La seconda soluzione, seppur valida e funzionante pone un rischio dal punto di vista della <strong>validità del descrittore</strong> se qualche processo prova a cancellare l’array semaforico. Perché essendo che la rimozione fisica dell’array semaforico legata alla <code>semop()</code>, questo potrebbe essere eliminato definitivamente se nessun processo è in attesa su un semaforo.</p>
+<p>Questo quindi vuol dire che nel momento in cui un’altro processo che ha ottenuto direttamente il costruttore (tramite la <code>shm</code>) prova ad utilizzare il semaforo potrebbe ottenere un comportamento inaspettato.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="Sincronizzazione_locale.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                            </a>
 
 
                         <div style="clear: both"></div>
@@ -190,6 +213,9 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="Sincronizzazione_locale.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                    </a>
 
             </nav>
 
