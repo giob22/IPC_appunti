@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-c730e2a4.js";
+            window.path_to_searchindex_js = "searchindex-427cfd43.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-d8baf949.js"></script>
@@ -1707,60 +1707,7 @@ int queue_condition(Monitor*, int);
 <p>Possiamo quindi capire da questa immagine quali sono le informazioni di interesse per una mailbox.</p>
 <p>Il ruolo della mailbox è da intermediario.</p>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="note"><a class="header" href="#note">NOTE</a></h1>
-<h2 id="utilizzo-di-semafori-tra-processi-con-fork--exec"><a class="header" href="#utilizzo-di-semafori-tra-processi-con-fork--exec">Utilizzo di semafori tra processi con fork + exec</a></h2>
-<p><strong>PROBLEMA DELLA VALIDITÁ DEL DESCRITTORE DELL’ARRAY SEMAFORICO:</strong></p>
-<p>Supponiamo di avere un processo che crea altri <code>N</code> processi con <code>fork() + exec()</code> oppure in generale più processi con area testo diversa che operano su una <code>shm</code> il cui accesso è gestito dall’utilizzo di semafori.</p>
-<p>Possiamo avere diverse implementazioni che apparentemente potrebbero sembrare valide, ma in realtà nascondono un problema legato alla validità del descrittore dell’array semaforico.</p>
-<p>(vedi prova di autovalutazione#1)</p>
-<p>due potrebbero essere le soluzioni:</p>
-<ol>
-<li>
-<p>il padre fa una <code>shmget + shmat</code> e <code>semget</code> (utilizzando una chiave generata con <code>ftok</code>) creando le risorse IPC e in tutte le applicazioni generate con <code>fork + exec</code> si ripete <code>shmget + shmat</code> e `semget;</p>
-</li>
-<li>
-<p>il padre fa una <code>shmget + shmat</code> e <code>semget</code> creando le risorse IPC, ma mettendo nella struttura dati che descrive la risorsa condivisa da proteggere anche l’identificativo dell’array semaforico.</p>
-<pre><code class="language-c"> struct SharedData{
-     int semid;
-     // ...
- }
-</code></pre>
-<p>Quindi nelle applicazioni create con <code>fork + exec</code> si eseguirà solo <code>shmget + shmat</code> (utilizzando la stessa chiave generata con <code>ftok</code>) ottenendo il descrittore dell’array semaforico accedendo alla struttura dati condivisa.</p>
-</li>
-</ol>
-<p>La seconda soluzione, seppur valida e funzionante pone un rischio dal punto di vista della <strong>validità del descrittore</strong> se qualche processo prova a cancellare l’array semaforico. Perché essendo che la rimozione fisica dell’array semaforico legata alla <code>semop()</code>, questo potrebbe essere eliminato definitivamente se nessun processo è in attesa su un semaforo.</p>
-<p>Questo quindi vuol dire che nel momento in cui un’altro processo che ha ottenuto direttamente il costruttore (tramite la <code>shm</code>) prova ad utilizzare il semaforo potrebbe ottenere un comportamento inaspettato.</p>
-<p>Ovviamente questo problema può presentarsi anche nel caso in cui il processo figlio, creato con <code>fork + exec</code>, tenti di utilizzare un semaforo che inizialmente esiste e di cui ottiene il descrittore tramite <code>semget()</code>, usando la stessa chiave del processo padre. Tuttavia, prima che il semaforo non sia più necessario all’esecuzione del figlio, il padre potrebbe marcarlo come <strong>eliminabile</strong>.</p>
-<p>In questa situazione, nonostante il semaforo possa essere necessario al processo figlio che possiede un descrittore valido, esso potrebbe comunque essere eliminato fisicamente, poiché l’eliminazione di un array di semafori dipende da <code>semop()</code>. In particolare, un semaforo marcato come eliminabile non viene rimosso fisicamente finché esiste un processo in attesa su almeno uno dei semafori dell’array.</p>
-<p>Nel mio <strong>git hub</strong> ho simulato questa situazione con due processi che eseguono due codici diversi ma utilizzano la stessa chiave per ottenere il descrittore del semaforo su cui entrambi lavorano.</p>
-<p>Sono contenuti all’interno della cartella <code>IPC/eliminazione_semafori</code>. Ecco l’output su terminale:</p>
-<pre><code class="language-console">[PROGRAMMA 1] chiave: 1644457381
-[PROGRAMMA 1] il descrittore del semaforo é: 9
-[PROGRAMMA 1] eseguo una ipcs per verificare a terminale se è presente il semaforo
-[PROGRAMMA 2] chiave: 1644457381
-valore di ds_sem: -1
-il semaforo é stato creato correttamente dal programma1.c
-ho ottenuto il semaforo esistente
-[PROGRAMMA 2] il descrittore del semaforo é: 9
-[PROGRAMMA 2] faccio una signal sul semaforo per sbloccare il programma1 (adesso la coda di attesa del semaforo è vuota!!)
-[PROGRAMMA 2] sto per eseguire un'operazione pesante che non mi permetterà di accedere immediatamente sul semaforo
-
------- Semaphore Arrays --------
-key        semid      owner      perms      nsems     
-0x62046da5 9          giovanni   644        1         
-
-[PROGRAMMA 1] mi metto in attesa sul semaforo
-[PROGRAMMA 1] sono stato sbloccato
-[PROGRAMMA 1] marco come eliminabile il semaforo
-[PROGRAMMA 2] eseguo una ipcs per verificare a terminale se è presente il semaforo semaforo (dopo aver fatto un'operazione pesante che ha impiegato 10s) perché ne ho ancora bisogno (ho fatto la semget anche io con la stessa chiave)
-
------- Semaphore Arrays --------
-key        semid      owner      perms      nsems     
-
-[PROGRAMMA 2]Ottengo il valore di sem_val per il semaforo con id_sem = 9 (-1 indica che il semaforo non esiste): -1
-FINE 2
-FINE 1
-</code></pre>
+<h1 id="note"><a class="header" href="#note">Note:</a></h1>
 
                     </main>
 
