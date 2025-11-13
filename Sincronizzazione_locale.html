@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-84c7f0ab.js";
+            window.path_to_searchindex_js = "searchindex-380e69bc.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-d8baf949.js"></script>
@@ -258,7 +258,7 @@
   <img src="images/receive_comportamento.png" width="400">
 </p>
 
-<p><strong>System V linux</strong> di default ci garantisce l’implementazione di una receive <strong>bloccante</strong>.</p>
+<p><strong>System V linux</strong> di default ci garantisce l’implementazione sia di una receive <strong>bloccante</strong> sia di una receive <strong>non bloccante</strong> mendiante il meccanismo dei FLAG.</p>
 <hr>
 <p>Quando si parla di blocco e sblocco ci si riferisce ai possibili stati di un processo.</p>
 <hr>
@@ -347,7 +347,7 @@
   <img src="images/send_synch.png" width="400">
 </p>
 
-<p>Ovviamente il r<strong>icevente potrebbe essere già pronto</strong> per la ricezione di un messaggio RTS ancor prima che questo venga inviato;</p>
+<p>Ovviamente il <strong>ricevente potrebbe essere già pronto</strong> per la ricezione di un messaggio RTS ancor prima che questo venga inviato;</p>
 <p>in questa situazione il <strong>receiver è già sospeso</strong> e alla ricezione del messaggio si sblocca e invia il messaggio di risposta.</p>
 <h2 id="indirizzamento"><a class="header" href="#indirizzamento"><strong>Indirizzamento</strong></a></h2>
 <p>Mi peremtte di specificare la destinazione e la provenienza della gestione del messaggio.</p>
