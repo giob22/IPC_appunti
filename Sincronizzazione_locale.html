@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-0b2c35a8.js";
+            window.path_to_searchindex_js = "searchindex-e3603597.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-d8baf949.js"></script>
@@ -184,7 +184,7 @@
 <li>le <strong>risorse sono tutte private</strong>;</li>
 <li>Non possono esser modificate direttamente da altri processi.</li>
 </ul>
-<p>Il naturale supporto fisico a questo modello, come detto, sono i sistemi con architettura distribuita.</p>
+<p>Il naturale supporto fisico a questo modello, come detto, sono i sistemi con <strong>architettura distribuita</strong>.</p>
 <p align="center">
   <img src="images/modello_locale.png" width="400">
 </p>
@@ -210,7 +210,7 @@
 <p>Quindi serve a creare un ambiente uniforme di comunicazione, in modo che due programmi possano scambiarsi dati come se lavorassero nello stesso sistema.</p>
 <p>Noi faremo tutto in locale → con le mailbox System V permetteremo ai processi di comunicare su canali di comunicazione che saranno delle <em>shared memory</em>.</p>
 <hr>
-<p>La <strong>cooperazione</strong> si realizza mediante lo <strong>scambio diretto di messaggi</strong> per mezzo di primitive fornite dal S.O.</p>
+<p>La <strong>cooperazione</strong> si realizza mediante lo <strong>scambio diretto di messaggi</strong> per mezzo di primitive fornite dal sistema operativo.</p>
 <p>In questo modello la mutua esclusione sulle risorse di un processo è <strong>garantita</strong>, appunto perché tutte le risorse sono private.</p>
 <h2 id="primitive"><a class="header" href="#primitive">Primitive</a></h2>
 <p>Per gestire quindi la cooperazione in un modello ad ambiente locale abbiamo la necessità di due tipologie di primitive:</p>
@@ -246,7 +246,7 @@
 </p>
 
 <p><strong>System V linux</strong> di default ci garantisce l’implementazione di una <strong>send</strong> asincrona.</p>
-<p>Quindi per implementare la send sincrona dobbiamo sfruttare la send asincrona e la receive.</p>
+<p>Quindi per implementare la send sincrona dobbiamo sfruttare la send asincrona e la receive (bloccante).</p>
 <h3 id="receive"><a class="header" href="#receive">Receive</a></h3>
 <p>Analogamente alla primitiva send, la primitiva receive ha caratteristiche differenti a seconda del sistema operativo. In particolare può avere un comportamento di due tipi:</p>
 <ul>
@@ -285,7 +285,7 @@
 <ul>
 <li>Nessuna delle due parti, sender e receiver, rimane in attesa della consegna;</li>
 <li>completo disaccoppiamento tra mittente e destinatario;</li>
-<li>tipo sincronizzazione è il più comune tra processi distribuiti, non conosciamo il momento in cui il destinatario o il sorgete è pronto.</li>
+<li>tipo sincronizzazione che è il più comune tra processi distribuiti, non conosciamo il momento in cui il destinatario o il sorgete è pronto.</li>
 </ul>
 </li>
 </ul>
@@ -293,7 +293,7 @@
 <h2 id="implementazione-di-una-send-sincrona-a-mezzo-di-send-asincrona"><a class="header" href="#implementazione-di-una-send-sincrona-a-mezzo-di-send-asincrona">Implementazione di una send sincrona a mezzo di send asincrona</a></h2>
 <p>Siamo in grado di implementare una <strong>send sincrona</strong> utilizzando send asincrona + receive bloccante (default di <strong>System V linux</strong>).</p>
 <p>La send sincrona è utile quando il mittende deve conoscere se il destinatario ha ricevuto o meno il messaggio.</p>
-<p>→ il sender deve determinare se il messaggio è stato ricevuto e lo fa inviando dei messaggi aggiuntivi al messaggio contenente l’informazione da scambiare.</p>
+<p>→ il sender deve determinare se il messaggio è stato ricevuto e lo fa inviando prima dei messaggi aggiuntivi al messaggio contenente l’informazione da scambiare.</p>
 <p align="center">
   <img src="images/send_sincrona_SVL.png" width="300">
 </p>
@@ -304,7 +304,7 @@
 <p>Il sender dopo aver inviato una richiesta <em>request-to-send</em> si mette in attesa di una risposta da parte del destinatario.</p>
 </li>
 <li>
-<p>Nel momento in cui il destinatario è pronto per la comunicazione invia una richiesta di <em>OK-to-send</em> al sender e a sua volta si mette in attesa per il messaggio.</p>
+<p>Nel momento in cui il destinatario ha ricevuto il primo messaggio dal sender ed è pronto per la comunicazione invia una richiesta di <em>OK-to-send</em> al sender e a sua volta si mette in attesa per il messaggio.</p>
 </li>
 <li>
 <p>Il sender una volta sbloccato invia la il messaggio effettivo.</p>
@@ -350,7 +350,7 @@
 <p>Ovviamente il <strong>ricevente potrebbe essere già pronto</strong> per la ricezione di un messaggio RTS ancor prima che questo venga inviato;</p>
 <p>in questa situazione il <strong>receiver è già sospeso</strong> e alla ricezione del messaggio si sblocca e invia il messaggio di risposta.</p>
 <h2 id="indirizzamento"><a class="header" href="#indirizzamento"><strong>Indirizzamento</strong></a></h2>
-<p>Mi peremtte di specificare la destinazione e la provenienza della gestione del messaggio.</p>
+<p>Permette di specificare la destinazione e la provenienza della gestione del messaggio.</p>
 <p>In che modo posso specificare mittente e destinatario?</p>
 <p>Esistono più modi:</p>
 <ul>
@@ -366,7 +366,7 @@
 <p><strong>comunicazione diretta asimmetrica</strong></p>
 <ul>
 <li>il mittente esplicita il <strong>PID</strong> del destinatario nella send();</li>
-<li>il destinatario non indica un <strong>PID</strong>, viene a <strong>conoscenza</strong> del PID del mittente <strong>alla ricezione del messaggio</strong>, tramite parametro di uscita (che si troverà all’interno del <strong>payload</strong>).</li>
+<li>il destinatario non indica un <strong>PID</strong>, viene a <strong>conoscenza</strong> del PID del mittente <strong>alla ricezione del messaggio</strong>, tramite un parametro di uscita (che si troverà all’interno del <strong>payload</strong>).</li>
 </ul>
 </li>
 <li>
@@ -406,7 +406,8 @@
   <img src="images/mailbox.png" width="300">
 </p>
 
-<p>Infine possiamo quindi avere diversi modi di sincronizzazione per modelli ambiente locale che sono determinati dalla combinazione tra le tipologie di sincronizzazione che possiamo ottenere e i possibili indirizzamenti utilizzabili.</p>
+<hr>
+<p>In conclusione possiamo avere diversi modi di <strong>gestire la cooperazione</strong> per modelli ambiente locale che sono determinati dalla combinazione tra le <strong>tipologie di sincronizzazione</strong> che possiamo ottenere e i possibili <strong>indirizzamenti</strong> utilizzabili.</p>
 <p><strong>Esempio di comunicazione di RENDEZVOUS con mailbox</strong></p>
 <p><strong>Rendezvous</strong>: send sincrona, receive  bloccante</p>
 <p align="center">
@@ -414,7 +415,7 @@
 </p>
 
 <p>Possiamo quindi capire da questa immagine quali sono le informazioni di interesse per una mailbox.</p>
-<p>Il ruolo della mailbox è da intermediario.</p>
+<p>Il ruolo della mailbox è da <strong>intermediario</strong> nella comunicazione.</p>
 
                     </main>
 

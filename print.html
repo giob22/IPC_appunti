@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-0b2c35a8.js";
+            window.path_to_searchindex_js = "searchindex-e3603597.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-d8baf949.js"></script>
@@ -1113,7 +1113,7 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 <p>Il monitor stesso sarà una risorsa condivisa.</p>
 <p>Lo scopo di un monitor è quello di facilitare la programmazione concorrente. Infatti permette di creare <strong>politiche di accesso</strong> alle risorse condivise tramite delle condizioni che implementeremo (<strong>variabili di condizione</strong>).</p>
 <p align="center">
-  <img src="images/politiche_accesso.png" width="300">
+  <img src="images/politiche_accesso.png" width="400">
 </p>
 
 <p>Un monitor lo possiamo vedere quindi come <strong>tipo di dato astratto</strong> contenente variabili di condizione e procedure che implementano le politiche di accesso ad una risorsa condivisa (<code>shm</code>).</p>
@@ -1127,7 +1127,7 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 <p><strong>Risorsa</strong>: consiste nella risorsa condivisa tra i vari processi che la competono;</p>
 </li>
 <li>
-<p><strong>Stato della risorsa</strong>: consiste in altri variabili membro utili per la gestione come:</p>
+<p><strong>Stato della risorsa</strong>: consiste in altre variabili membro utili per la gestione come:</p>
 <ul>
 <li>puntatore di testa/coda;</li>
 <li>pid dell’ultimo processo ad aver effettuato un modifica sulla <code>shm</code>;</li>
@@ -1163,11 +1163,11 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 <li>
 <p><strong>librerie di funzioni</strong> del linguaggio di programmazione</p>
 <p>Dobbiamo implementare delle librerie ad <em>hoc</em> per complementare quello che ci offre il linguaggio di programmazione; per gestire poi la competizione e cooperazione.</p>
-<p>In <code>c</code> implementiamo metoti come <code>enter()</code> e <code>leave_monitor()</code> per permettere l’operazione mutuamente esclusiva sulla risorsa;</p>
+<p>In <code>c</code> implementiamo metodi come <code>enter_monitor()</code> e <code>leave_monitor()</code> per permettere di operare in maniera mutuamente esclusiva sulla risorsa;</p>
 </li>
 <li>
 <p><strong>parole chiave</strong> del linguaggio di programmazione</p>
-<p>Esempio chiave è <strong>JAVA</strong>, che utilizza un monitor implicito che attraverso la parola chiave <strong>Synchronize</strong> permette a metodi di esser eseguiti in maniera mutuamente esclusiva.</p>
+<p>Esempio chiave è <strong>JAVA</strong>, che utilizza un monitor implicito che attraverso la parola chiave <strong>Synchronized</strong> permette a metodi di esser eseguiti in maniera mutuamente esclusiva.</p>
 </li>
 </ul>
 <pre><code class="language-c">Monitor M {
@@ -1178,10 +1178,10 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
     }
 }
 </code></pre>
-<p>Per la competizione il monitor fa uso di semafori <strong>lock</strong> per gestire la mutua esclusione: per l’entrata sul monitor e l’uscita sul monitor.</p>
+<p>Per la gestione della competizione il monitor fa uso di semafori <strong>lock</strong> per: l’entrata sul monitor e l’uscita sul monitor.</p>
 <h3 id="cooperazione"><a class="header" href="#cooperazione">Cooperazione</a></h3>
-<p>Nella gestione della cooperazione, i processi si sospendono se <strong>non è verificata</strong> una “<strong>condizione logica</strong>” di accesso.</p>
-<p>Per la gestione della cooperazione si introduce un tipo di variabile detta <strong>variabile condition</strong>, che determina la sospensione di un processo nel momento in cui una condizione non è verificata.</p>
+<p>Nella gestione della cooperazione, i processi si sospendono se <strong>non è verificata</strong> una “<strong>condizione logica</strong>” di accesso (<em>condizione di sincronizzazione</em>).</p>
+<p>Per la gestione della cooperazione si introduce un tipo di variabile detta <strong>condition variable</strong>, che determina la sospensione di un processo nel momento in cui una condizione non è verificata.</p>
 <pre><code class="language-c">var_cond x;
 </code></pre>
 <p>Tale variabile condition definisce due metodi:</p>
@@ -1190,8 +1190,8 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 <li>… fino a che un altro processo esegue <code>x.signal_cond()</code>.</li>
 </ul>
 <p>Simile ai semafori ma le operazioni <strong>hanno un comportamento diverso</strong>.</p>
-<p>Avremo tante variabili condition quante sono le condizioni per cui un processo deve esser sospeso per cooperazione</p>
-<p>→ ogni variabile condition è associata ad una condizione logica.</p>
+<p>Avremo tante variabili condition quante sono le condizioni per cui un processo deve esser sospeso per cooperazione.</p>
+<p>→ ogni condition variable è <strong>associata</strong> ad una condizione logica.</p>
 <pre><code class="language-c">Monitor M {
     var_cond x;
     var_cond y;
@@ -1224,17 +1224,17 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 
 <ul>
 <li>Sono presenti diverse <strong>code</strong> in cui sono contenuti i processi che si sono sospesi e attendono si essere riattivati.</li>
-<li>Procedure che un processo piò effettuare sulla <code>shm</code> in modo esclusivo.</li>
+<li>Procedure che un processo può eseguire sulla <code>shm</code> in modo esclusivo.</li>
 <li><strong>local data</strong> in cui sono contenute le strutture condivise.</li>
-<li><strong>condition variables</strong> sono la sezione in cui sono dichiarate le variabili condition.</li>
+<li><strong>condition variables</strong> sono la sezione in cui sono dichiarate le condition variables.</li>
 </ul>
 <p align="center">
   <img src="images/p1.png" width="300">
 </p>
 
 <p>Il processo entra nel monitor chiedendo di eseguire una procedura in mutua esclusione. Quindi dopo la chiamata alla procedura di interesse viene chiamata una <code>enter_monitor()</code>.</p>
-<p>All’interno della procedura potrebbe esserci una condizione che potrebbe portare il processo a sospendersi nel caso in cui non sia verificata; condizioni associate a variabili condition.</p>
-<p>→ Per ogni variabile condition oltre ad una condizione logica è associata una <strong>coda</strong> in cui saranno memorizzati tutti i processi che si sono sospesi per il mancato soddisfacimento della condizione logica.</p>
+<p>All’interno della procedura potrebbe esserci una condizione che potrebbe portare il processo a sospendersi nel caso in cui non sia verificata; condizioni associate a condition variables.</p>
+<p>→ Per ogni condition variable oltre ad una condizione logica è associata una <strong>coda</strong> in cui saranno memorizzati tutti i processi che si sono sospesi per il mancato soddisfacimento della condizione logica.</p>
 <p>Quindi nel momento in cui è da gestire una cooperazione le procedure controllano, tramite le variabili locali, se la <strong>condizione di sincronizzazione</strong> è valida (es. buffer vuoto, buffer occupato).</p>
 <p>Se la <strong>condizione di sincronizzazione</strong> è valida, il processo completa l’esecuzione e libera il monitor con una chiamata <code>leave_monitor()</code>.</p>
 <p>Condizione <strong>non</strong> valida:</p>
@@ -1242,8 +1242,8 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
   <img src="images/p2.png" width="300">
 </p>
 
-<p>Se al momento del controllo la <strong>condizione di sincronizzazione non è valida</strong>, il processo si sospende volontariamente usando la <strong>condition</strong> <strong>variables</strong> associata alla condizione che non è stata soddisfatta.</p>
-<p>Mentre è in attesa, il monitor diventa libero, poiché il processo che si è sospeso deve aver rilasciato il monitor prima della sospensione con una <code>leave_monitor()</code>, e quindi è accessibile ad altri processi che attendono di entrare.</p>
+<p>Se al momento del controllo la <strong>condizione di sincronizzazione non è valida</strong> il processo si sospende volontariamente usando la <strong>condition</strong> <strong>variables</strong> associata alla condizione che non è stata soddisfatta.</p>
+<p>Mentre è in attesa, il monitor diventa libero, poiché il processo che si è sospeso deve aver <strong>rilasciato</strong> il monitor prima della sospensione, quindi quest’ultimo è accessibile ad altri processi che attendono di entrare.</p>
 <h2 id="note-su-condition-variables"><a class="header" href="#note-su-condition-variables">Note su condition variables</a></h2>
 <hr>
 <p style="font-size:1.3em; text-align:center;">
@@ -1267,7 +1267,7 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 <p>→ Il processo spontaneamente si sospense utilizzando <code>wait_cond()</code> sulla condition variables associata a tale condizione.</p>
 <p>Nel momento in cui <code>P</code> si sospende questo rilascia la risorsa monitor agli altri processi in attesa. Quindi il prossimo processo schedulato in attesa, <code>Q</code>, entra nel monitor ed esegue una procedura che potrebbe comportare <strong>l’aggiornamento dello stato della risorsa</strong>.</p>
 <p>→ La condizione di sincronizzazione che ha portato <code>P</code> a sospendersi viene soddisfatta, quindi tale processo può continuare la propria esecuzione</p>
-<p>Il processo <code>Q</code> dopo la modifica che ha portato la risorsa ad essere pronta per <code>P</code>, riattiva <code>P</code> che ritorna pronto.</p>
+<p>Il processo <code>Q</code> dopo la modifica che ha portato la risorsa ad essere pronta per <code>P</code>, riattiva <code>P</code> che ritorna pronto, mediante l’esecuzione di una <code>signal_cond()</code> sulla condition variable su cui <code>P</code> è sospeso.</p>
 <hr>
 <p><strong>PROBLEMA:</strong> <code>P</code> e <code>Q</code> non possono eseguire entrambi nel monitor, si violerebbe la <strong>mutua esclusione</strong>.</p>
 <hr>
@@ -1293,8 +1293,8 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 </code></pre>
 <p>In questo modo quando <code>P</code> entra per primo nel monitor, <strong>prematuramente</strong> (la condizione di sincronizzazione non è ancora valida), per cui si <strong>sospende</strong>.</p>
 <p>Il processo <code>Q</code> <strong>opera sulla risorsa condivisa</strong> (es. buffer di stato) facendo in modo che venga soddisfatta la condizione di sincronizzazione, quindi effettua la <code>signal_cond()</code> sulla condition variable che comporta la sua sospensione.</p>
-<p>Quindi <code>Q</code> dovrà uscire dalla risorsa monitor con una <code>leave_monitor()</code>.</p>
-<p>→ <code>Q</code> attende l’uscira di <code>P</code> e <strong>compete</strong> con altri processi per rientrare nel monitor.</p>
+<p>Quindi <code>Q</code> dovrà <strong>rilasciare</strong> la risorsa monitor.</p>
+<p>→ <code>Q</code> attende l’uscita di <code>P</code> e <strong>compete</strong> con altri processi per rientrare nel monitor.</p>
 <p align="center">
   <img src="images/signal_and_wait.png" width="300">
 </p>
@@ -1309,23 +1309,23 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 </p>
 
 <p>Tale soluzione di Hoare è un caso particolare di signal_and_wait, detta <strong>signal_and_urgent_wait</strong>.</p>
-<p>Prevede che il processo <code>Q</code> abbia la <strong>priorità</strong> su ogni altri processi che intendono entrare nel monitor.</p>
-<p>Questa soluzione si può ottenere sospendendo il processo <code>Q</code> dopo la <code>signal_wait()</code> su una cosa detta <em>urgent_queue</em>, separata dal mutex.</p>
+<p>Prevede che il processo <code>Q</code> abbia la <strong>priorità</strong> su ogni altro processo che intende entrare nel monitor.</p>
+<p>Questa soluzione si può ottenere sospendendo il processo <code>Q</code> dopo la <code>signal_wait()</code> su una coda detta <em>urgent_queue</em>, separata da quella del mutex (coda di processi in attesa per entrare nel monitor).</p>
 <p>mutex: meccanismo di mutua escluzione che permette l’accesso al monitor ad un solo processo per volta.</p>
 <h3 id="seconda-soluzione-signal-and-continue"><a class="header" href="#seconda-soluzione-signal-and-continue">Seconda soluzione: signal and continue</a></h3>
 <p><em><strong>signal_and_continue</strong></em>:</p>
 <ul>
-<li>privilegia il processo <strong>segnalatore</strong> rispetto al <strong>segnalante</strong>;</li>
+<li>privilegia il processo <strong>segnalatore</strong> rispetto al <strong>segnalato</strong>;</li>
 <li>il processo <code>Q</code> segnalatore prosegue la sua esecuzione, mantenendo l’accesso esclusivo al monitor.</li>
 </ul>
-<p>Quindi dopo il risvegli di <code>P</code> sospeso per il mancato soddisfacimento della condizione di sincronizzazione, questo viene nuovamente sospeso questa volta nella coda del mutex (insieme a tutti gli altri processi che in attesa di entrare nel monitor).</p>
+<p>Quindi dopo il risvegli di <code>P</code> sospeso per il mancato soddisfacimento della condizione di sincronizzazione viene nuovamente sospeso, questa volta nella coda del mutex (insieme a tutti gli altri processi che in attesa di entrare nel monitor).</p>
 <p>Per semplicità di implementazione il monitor signal-and-continue non usa la coda <strong>urgent</strong>.</p>
 <p align="center">
   <img src="images/wait-continue.png" width="400">
 </p>
 
 <p>Essendo che <code>P</code> compete con gli altri processi per accedere al monitor potrebbe verificarsi la situazione in cui ad esser schedulato prima di <code>P</code> è <code>K</code>, che entra nel monitor una volra che <code>Q</code> lo ha rilasciato.</p>
-<p>In qeusta sistuazione potrebbe accadere che <code>K</code> <strong>modifichi nuovamente la risorsa</strong> (le strutture contenute in <em>local data</em>) e quindi potrebbe far in modo che la condizione di sincronizzazione per <code>P</code> sia <strong>non più verificata</strong>.</p>
+<p>In questa sistuazione potrebbe accadere che <code>K</code> <strong>modifichi nuovamente la risorsa</strong> (le strutture contenute in <em>local data</em>) e quindi potrebbe far in modo che la condizione di sincronizzazione per <code>P</code> sia <strong>non più verificata</strong>.</p>
 <p>Quindi è necessario che una volta che <code>P</code> rientri all’interno del monitor verifichi nuovamente la condizione di sincronizzazione.</p>
 <p>→ Non abbiamo più la certezza che nel momento in cui <code>P</code> rientra nel monitor la condizione sia verificata.</p>
 <p>Questo si può tradurre anche in una condizione di <strong>attesa indefinita</strong> per <code>P</code> (<strong>starvation</strong>).</p>
@@ -1339,16 +1339,16 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 <p><code>P</code> non ha la certezza che la condizione sia verificata, quindi deve controllare ogni volta che riottiene l’accesso al monitor.</p>
 <h4 id="signal_all"><a class="header" href="#signal_all">signal_all</a></h4>
 <p><code>signal_cond()</code> riattiva al più un solo processo.</p>
-<p>Nel momento in cui si vuole risvegliare invece tutti i processi sospesi su una <strong>condition variable</strong> è possibili utilizzare la variante:</p>
+<p>Nel momento in cui si vuole risvegliare al più tutti i processi sospesi su una <strong>condition variable</strong> è possibili utilizzare la variante:</p>
 <pre><code class="language-c">signal_all();
 </code></pre>
-<p>Tutti i processi risvegliati vengono messi nella <em>entry_queue</em>, dalla quale uno alla volta potraà rientrare nel monitor.</p>
+<p>Tutti i processi risvegliati vengono messi nella <em>entry_queue</em>, dalla quale uno alla volta potrà rientrare nel monitor.</p>
 <p align="center">
   <img src="images/signal_all.png" width="400">
 </p>
 
 <h3 id="confronto-signal-and-wait-vs-signal-and-continue"><a class="header" href="#confronto-signal-and-wait-vs-signal-and-continue">Confronto: signal-and-wait vs signal-and-continue</a></h3>
-<p>La semantica di <em>signal-and-wait</em> richiede che venga chiamata <strong>precisamente quando il processo segnalato deve essere svegliato</strong>.</p>
+<p>La semantica di <em>signal-and-wait</em> richiede che venga chiamata <strong>precisamente quando il processo segnalato deve essere svegliato</strong>. (!)</p>
 <p>→ ovvero nel momento in cui è soddisfatta la condizione di sincronizzazione.</p>
 <p>La semantica di <em>signal-and-continue</em> (e <em>signal-all</em>) è più <strong>robusta</strong>:</p>
 <ul>
@@ -1356,11 +1356,11 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 <li>saranno i processi risvegliati a controllare se possono eseguire, oppure sospensersi.</li>
 </ul>
 <h3 id="granularità-semaforo-vs-monitor"><a class="header" href="#granularità-semaforo-vs-monitor">Granularità: semaforo vs monitor</a></h3>
-<p>Entrambi, sia monitor che semafori, sono dei concetti necessaria per la gestione di situazioni di cooperazione o competizione tra processi su una risorca condivisa.</p>
+<p>Entrambi, sia monitor che semafori, sono dei concetti necessaria per la gestione di situazioni di cooperazione o competizione tra processi concorrenti su una risorca condivisa.</p>
 <p>Sono simili nell’utilizzo ma hanno tante differenza sia rispetto alla robustezza che alla granularità.</p>
 <p>In particolar modo i semafori hanno una granularita <em>fine</em>, molto bassa, proprio perché gestiscono la mutua esclusione a <strong>livello di singole operazioni</strong>.</p>
 <p>Mentre i monitor hanno una granularità più alta: il controllo non è sulla singola operazione sulla risorsa condivisa, ma sull’intera risorsa condivisa.</p>
-<p>→ infatti nell’implementazione del problema produttori/consumatori con buffer di stato la modifica di questo a fine di un operazione (<code>IN_USO → OCCUPATO/LIBERO</code>), che sia di scrittura o lettura, deve essere eseguira all’interno del monitor (bloccando quindi gli altri processi che desiderano accedervi).</p>
+<p>→ infatti nell’implementazione del problema produttori/consumatori con buffer di stato la modifica di questo a fine di un’operazione (<code>IN_USO → OCCUPATO/LIBERO</code>), che sia di scrittura o lettura, deve essere eseguira all’interno del monitor (bloccando quindi gli altri processi che desiderano accedervi). <br> →devono esser modificate delle variabili di stato (es. <code>num_liberi</code>, <code>num_occupati</code>).</p>
 <p>Mentre con i semafori la modifica sul buffer di stato <code>IN_USO → OCCUPATO/LIBERO</code> non era inclusa nella sezione critica, non ostacolavamo gli altri processi ad operare sulla risorsa.</p>
 <p>Invece parlando di <strong>robustezza</strong> i monitor sono sicuramente molto più sicuri per via del loro <strong>livello di astrazione maggiore</strong>. Tutti le operazioni sulla memoria condivisa sono contenute all’interno del monitor. (possiamo dire che il monitor è un wrapper della <code>shm</code>)</p>
 <p>Mentre per i semafori la gestione è esplicita, quindi è più alto il rischio di eventuali <strong>deadlock</strong>.</p>
@@ -1372,7 +1372,8 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 <p>L’header della libreria che implementa i monitor sarà quindi:</p>
 <p><code>monitor.h</code></p>
 <pre><code class="language-c">typedef struct {
-    // id del semaforo per realizzare il mutex sul monitor, per gestire la mutua esclusione sul monitor
+    // id del semaforo per realizzare il mutex sul monitor, 
+    // per gestire la mutua esclusione sul monitor
     int mutex;
 
     // nel caso in cui implementiamo il paradigma signal-and-wait-Hoaro
@@ -1382,10 +1383,12 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
     // numero di condition variable
     int num_var_cond;
 
-    // id del semaphor set in cui sono contenuti i semafori associati ad ogni condition variable
+    // id del semaphor set in cui sono contenuti i semafori 
+    // associati ad ogni condition variable
     int id_conds
 
-    // id della memoria condivisa per i contatori dei processi sospesi su ogni condition variable e della coda urgent
+    // id della memoria condivisa per i contatori dei processi sospesi 
+    // su ogni condition variable e della coda urgent
     int id_shm;
 
     // array delle variabili condition count
@@ -1475,7 +1478,7 @@ int queue_condition(Monitor*, int);
 <li>le <strong>risorse sono tutte private</strong>;</li>
 <li>Non possono esser modificate direttamente da altri processi.</li>
 </ul>
-<p>Il naturale supporto fisico a questo modello, come detto, sono i sistemi con architettura distribuita.</p>
+<p>Il naturale supporto fisico a questo modello, come detto, sono i sistemi con <strong>architettura distribuita</strong>.</p>
 <p align="center">
   <img src="images/modello_locale.png" width="400">
 </p>
@@ -1501,7 +1504,7 @@ int queue_condition(Monitor*, int);
 <p>Quindi serve a creare un ambiente uniforme di comunicazione, in modo che due programmi possano scambiarsi dati come se lavorassero nello stesso sistema.</p>
 <p>Noi faremo tutto in locale → con le mailbox System V permetteremo ai processi di comunicare su canali di comunicazione che saranno delle <em>shared memory</em>.</p>
 <hr>
-<p>La <strong>cooperazione</strong> si realizza mediante lo <strong>scambio diretto di messaggi</strong> per mezzo di primitive fornite dal S.O.</p>
+<p>La <strong>cooperazione</strong> si realizza mediante lo <strong>scambio diretto di messaggi</strong> per mezzo di primitive fornite dal sistema operativo.</p>
 <p>In questo modello la mutua esclusione sulle risorse di un processo è <strong>garantita</strong>, appunto perché tutte le risorse sono private.</p>
 <h2 id="primitive"><a class="header" href="#primitive">Primitive</a></h2>
 <p>Per gestire quindi la cooperazione in un modello ad ambiente locale abbiamo la necessità di due tipologie di primitive:</p>
@@ -1537,7 +1540,7 @@ int queue_condition(Monitor*, int);
 </p>
 
 <p><strong>System V linux</strong> di default ci garantisce l’implementazione di una <strong>send</strong> asincrona.</p>
-<p>Quindi per implementare la send sincrona dobbiamo sfruttare la send asincrona e la receive.</p>
+<p>Quindi per implementare la send sincrona dobbiamo sfruttare la send asincrona e la receive (bloccante).</p>
 <h3 id="receive"><a class="header" href="#receive">Receive</a></h3>
 <p>Analogamente alla primitiva send, la primitiva receive ha caratteristiche differenti a seconda del sistema operativo. In particolare può avere un comportamento di due tipi:</p>
 <ul>
@@ -1576,7 +1579,7 @@ int queue_condition(Monitor*, int);
 <ul>
 <li>Nessuna delle due parti, sender e receiver, rimane in attesa della consegna;</li>
 <li>completo disaccoppiamento tra mittente e destinatario;</li>
-<li>tipo sincronizzazione è il più comune tra processi distribuiti, non conosciamo il momento in cui il destinatario o il sorgete è pronto.</li>
+<li>tipo sincronizzazione che è il più comune tra processi distribuiti, non conosciamo il momento in cui il destinatario o il sorgete è pronto.</li>
 </ul>
 </li>
 </ul>
@@ -1584,7 +1587,7 @@ int queue_condition(Monitor*, int);
 <h2 id="implementazione-di-una-send-sincrona-a-mezzo-di-send-asincrona"><a class="header" href="#implementazione-di-una-send-sincrona-a-mezzo-di-send-asincrona">Implementazione di una send sincrona a mezzo di send asincrona</a></h2>
 <p>Siamo in grado di implementare una <strong>send sincrona</strong> utilizzando send asincrona + receive bloccante (default di <strong>System V linux</strong>).</p>
 <p>La send sincrona è utile quando il mittende deve conoscere se il destinatario ha ricevuto o meno il messaggio.</p>
-<p>→ il sender deve determinare se il messaggio è stato ricevuto e lo fa inviando dei messaggi aggiuntivi al messaggio contenente l’informazione da scambiare.</p>
+<p>→ il sender deve determinare se il messaggio è stato ricevuto e lo fa inviando prima dei messaggi aggiuntivi al messaggio contenente l’informazione da scambiare.</p>
 <p align="center">
   <img src="images/send_sincrona_SVL.png" width="300">
 </p>
@@ -1595,7 +1598,7 @@ int queue_condition(Monitor*, int);
 <p>Il sender dopo aver inviato una richiesta <em>request-to-send</em> si mette in attesa di una risposta da parte del destinatario.</p>
 </li>
 <li>
-<p>Nel momento in cui il destinatario è pronto per la comunicazione invia una richiesta di <em>OK-to-send</em> al sender e a sua volta si mette in attesa per il messaggio.</p>
+<p>Nel momento in cui il destinatario ha ricevuto il primo messaggio dal sender ed è pronto per la comunicazione invia una richiesta di <em>OK-to-send</em> al sender e a sua volta si mette in attesa per il messaggio.</p>
 </li>
 <li>
 <p>Il sender una volta sbloccato invia la il messaggio effettivo.</p>
@@ -1641,7 +1644,7 @@ int queue_condition(Monitor*, int);
 <p>Ovviamente il <strong>ricevente potrebbe essere già pronto</strong> per la ricezione di un messaggio RTS ancor prima che questo venga inviato;</p>
 <p>in questa situazione il <strong>receiver è già sospeso</strong> e alla ricezione del messaggio si sblocca e invia il messaggio di risposta.</p>
 <h2 id="indirizzamento"><a class="header" href="#indirizzamento"><strong>Indirizzamento</strong></a></h2>
-<p>Mi peremtte di specificare la destinazione e la provenienza della gestione del messaggio.</p>
+<p>Permette di specificare la destinazione e la provenienza della gestione del messaggio.</p>
 <p>In che modo posso specificare mittente e destinatario?</p>
 <p>Esistono più modi:</p>
 <ul>
@@ -1657,7 +1660,7 @@ int queue_condition(Monitor*, int);
 <p><strong>comunicazione diretta asimmetrica</strong></p>
 <ul>
 <li>il mittente esplicita il <strong>PID</strong> del destinatario nella send();</li>
-<li>il destinatario non indica un <strong>PID</strong>, viene a <strong>conoscenza</strong> del PID del mittente <strong>alla ricezione del messaggio</strong>, tramite parametro di uscita (che si troverà all’interno del <strong>payload</strong>).</li>
+<li>il destinatario non indica un <strong>PID</strong>, viene a <strong>conoscenza</strong> del PID del mittente <strong>alla ricezione del messaggio</strong>, tramite un parametro di uscita (che si troverà all’interno del <strong>payload</strong>).</li>
 </ul>
 </li>
 <li>
@@ -1697,7 +1700,8 @@ int queue_condition(Monitor*, int);
   <img src="images/mailbox.png" width="300">
 </p>
 
-<p>Infine possiamo quindi avere diversi modi di sincronizzazione per modelli ambiente locale che sono determinati dalla combinazione tra le tipologie di sincronizzazione che possiamo ottenere e i possibili indirizzamenti utilizzabili.</p>
+<hr>
+<p>In conclusione possiamo avere diversi modi di <strong>gestire la cooperazione</strong> per modelli ambiente locale che sono determinati dalla combinazione tra le <strong>tipologie di sincronizzazione</strong> che possiamo ottenere e i possibili <strong>indirizzamenti</strong> utilizzabili.</p>
 <p><strong>Esempio di comunicazione di RENDEZVOUS con mailbox</strong></p>
 <p><strong>Rendezvous</strong>: send sincrona, receive  bloccante</p>
 <p align="center">
@@ -1705,7 +1709,7 @@ int queue_condition(Monitor*, int);
 </p>
 
 <p>Possiamo quindi capire da questa immagine quali sono le informazioni di interesse per una mailbox.</p>
-<p>Il ruolo della mailbox è da intermediario.</p>
+<p>Il ruolo della mailbox è da <strong>intermediario</strong> nella comunicazione.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="note"><a class="header" href="#note">NOTE</a></h1>
 <h2 id="utilizzo-di-semafori-tra-processi-con-fork--exec"><a class="header" href="#utilizzo-di-semafori-tra-processi-con-fork--exec">Utilizzo di semafori tra processi con fork + exec</a></h2>

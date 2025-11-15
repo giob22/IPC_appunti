@@ -35,7 +35,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-0b2c35a8.js";
+            window.path_to_searchindex_js = "searchindex-e3603597.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-d8baf949.js"></script>
@@ -181,7 +181,8 @@
 <p>L’header della libreria che implementa i monitor sarà quindi:</p>
 <p><code>monitor.h</code></p>
 <pre><code class="language-c">typedef struct {
-    // id del semaforo per realizzare il mutex sul monitor, per gestire la mutua esclusione sul monitor
+    // id del semaforo per realizzare il mutex sul monitor, 
+    // per gestire la mutua esclusione sul monitor
     int mutex;
 
     // nel caso in cui implementiamo il paradigma signal-and-wait-Hoaro
@@ -191,10 +192,12 @@
     // numero di condition variable
     int num_var_cond;
 
-    // id del semaphor set in cui sono contenuti i semafori associati ad ogni condition variable
+    // id del semaphor set in cui sono contenuti i semafori 
+    // associati ad ogni condition variable
     int id_conds
 
-    // id della memoria condivisa per i contatori dei processi sospesi su ogni condition variable e della coda urgent
+    // id della memoria condivisa per i contatori dei processi sospesi 
+    // su ogni condition variable e della coda urgent
     int id_shm;
 
     // array delle variabili condition count
