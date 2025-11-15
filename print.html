@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-380e69bc.js";
+            window.path_to_searchindex_js = "searchindex-0b2c35a8.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-d8baf949.js"></script>
@@ -1107,11 +1107,11 @@ Se specificato <code>SEM_UNDO</code> il sistema aggiornerá il contatore <code>s
 <!-- todo: fai l'implementazione di inizio e fine scrittura e lettura sfruttando un monitor signal-and-wait ed uno signal-and-continue-->
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="monitor"><a class="header" href="#monitor">Monitor</a></h1>
-<p>Il <strong>monitor</strong> è una struttura sintattica che opera su una risorsa condivisa (shm) gestendone l’accesso e la sincronizzazione tra processi/thread concorrenti.</p>
+<p>Il <strong>monitor</strong> è una struttura sintattica (modello concettuale) che opera su una risorsa condivisa (shm) gestendone l’accesso e la sincronizzazione tra processi/thread concorrenti.</p>
 <p>Un monitor abbina un insieme di <strong>operazioni</strong> ad una struttura dati (risorsa) condivisa tra processi.</p>
 <p>Il costrutto monitor è <strong>sintatticamente</strong> simile al costrutto <em>class</em> ma è utilizzato per la gestione delle risorse condivise tra processi. Quindi non possiede risorse locali, come avviene per le classi, ma delle risorse condivise.</p>
 <p>Il monitor stesso sarà una risorsa condivisa.</p>
-<p>Lo scopo di un monitor è quello di facilitare la programmazione condivisa. Infatti permette di creare <strong>politiche di accesso</strong> alle risorse condivise tramite delle condizioni che implementeremo (<strong>variabili di condizione</strong>).</p>
+<p>Lo scopo di un monitor è quello di facilitare la programmazione concorrente. Infatti permette di creare <strong>politiche di accesso</strong> alle risorse condivise tramite delle condizioni che implementeremo (<strong>variabili di condizione</strong>).</p>
 <p align="center">
   <img src="images/politiche_accesso.png" width="300">
 </p>
